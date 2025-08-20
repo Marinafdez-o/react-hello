@@ -1,28 +1,60 @@
-import React from "react";
+import React, { useState, useEffect } from 'react';
+import Contador from './Contador.jsx';
 
-//include images into your bundle
-import rigoImage from "../../img/rigo-baby.jpg";
+function Home() {
+  const [seconds, setSeconds] = useState(0);
+  const [mode, setMode] = useState('normal');
+  const [isRunning, setIsRunning] = useState(true);
 
-//create your first component
-const Home = () => {
-	return (
-		<div className="text-center">
-            
+  useEffect(() => {
+    let intervalId;
 
-			<h1 className="text-center mt-5">Hello Rigo!</h1>
-			<p>
-				<img src={rigoImage} />
-			</p>
-			<a href="#" className="btn btn-success">
-				If you see this green button... bootstrap is working...
-			</a>
-			<p>
-				Made by{" "}
-				<a href="http://www.4geeksacademy.com">4Geeks Academy</a>, with
-				love!
-			</p>
-		</div>
-	);
-};
+    if (isRunning) {
+      intervalId = setInterval(() => {
+        setSeconds(prev => {
+          if (mode === 'countdown') {
+            if (prev > 0) return prev - 1;
+            setIsRunning(false);
+            return 0;
+          } else {
+            return prev + 1;
+          }
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(intervalId);
+  }, [isRunning, mode]);
+
+  const parar = () => setIsRunning(false);
+  const reanudar = () => setIsRunning(true);
+  const reiniciar = () => {
+    setSeconds(0);
+    setIsRunning(false);
+  };
+  const cuentaRegresiva = () => {
+    setSeconds(10);
+    setMode('countdown');
+    setIsRunning(true);
+  };
+  const modoNormal = () => {
+    setSeconds(0);
+    setMode('normal');
+    setIsRunning(true);
+  };
+
+  return (
+    <div className="container text-center mt-5">
+      <Contador seconds={seconds} />
+      <div className="btn-group mt-4">
+        <button className="btn btn-danger" onClick={parar}>Parar</button>
+        <button className="btn btn-success" onClick={reanudar}>Reanudar</button>
+        <button className="btn btn-warning" onClick={reiniciar}>Reiniciar</button>
+        <button className="btn btn-info" onClick={cuentaRegresiva}>Cuenta Regresiva (10s)</button>
+        <button className="btn btn-secondary" onClick={modoNormal}>Contador Normal</button>
+      </div>
+    </div>
+  );
+}
 
 export default Home;
